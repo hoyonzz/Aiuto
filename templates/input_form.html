@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width initial-scale=1.0">
+    <title>Aiuto - 입력</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        textarea { width: 80%; margin-bottom: 10px; }
+        button { padding: 10px 15px; cursor: pointer; }
+        .message { margin-top: 15px; padding: 10px; border-radius: 5px; }
+        .success { background-color: #e7f4e8; color: #2d6a30; }
+        .error { background-color: #fdecea; color: #a03d3b; }
+    </style>
+</head>
+<body>
+    <h1>Aiuto: 무엇을 도와드릴까요?</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="user_text_input" cols="60" rows="5" placeholder="여기에 할 일, 아이디어 등을 입력하세요..." required></textarea>
+        <br>
+        <button type="submit">Aiuto에게 전달</button>
+    </form>
+
+    {# 처리 결과 메시지 표시 #}
+    {% if message %}
+        <p class="message success">{{ message }}</p>
+    {% endif %}
+    {% if error %}
+        <p class="message error">{{ error}} </p>
+    {% endif %}
+
+    {# 최근 작업 목록 표시 등 추가 기능 #}
+</body>
+</html>

@@ -1,0 +1,52 @@
+<Tasker를 연동하기 전, Notion의 데이터베이스와 연동하며 데이터 안정화를 먼저 하는게 좋다고 판단>
+주요 목표
+1. 핵심 기능 조기 검증 : 단순히 페이지 생성을 하는게 아니고, 실제 사용할 DB 속성을 설정하고 값을 제대로 넣을 수 있을지 검증
+2. AI 프롬프트 개선 방향 설정 : Notion DB에 어떤 속성을 채워 넣을지 결정되면, AI에게 해당 속성 값을 함께 제안하도록 프롬프트를 더 구체화. (suggested_properties활용)
+
+
+
+순서
+1. Notion DB 속성 확인, 속성들의 정확한 이름확인
+2. AI 프롬프트 수정(ai_service.py):AI가 suggested_properties에 어떤 속성들을 제안하면 좋을지 프롬프트에 명시
+3. views.py 수정(TaskCreateAPIView.post): notion_service.add_task 호출 전에 notion_properties딕셔너리를 채우는 로직을 추가
+- AI가 제안한 값을 사용하거나, 고정된 기본값 설정
+Notion API 형식에 맞게 딕셔너리를 구성
+select: {"속성이름": {"select": {"name": "옵션이름"}}}
+Date: {"속성이름": {"date": {start": "YYYY-MM-DD"}}}
+Text: {"속성이름": {"rich_text": [{"text": {"content": "텍스트 내용"}}]}}
+
+# apps/api/views.py (일부 수정)
+...
+    # 3. Notion 서비스 호출하여 페이지 생성
+    try:
+        notion_properties = {} # Notion 속성 준비
+        ai_props = ai_plan.get('suggested_properties', {}) # AI 제안 속성 가져오기
+
+        # 예시: AI 제안 또는 기본값으로 '상태' 속성 설정 (Notion DB에 '상태' Select 속성 가정)
+        status_value = ai_props.get('상태', ai_plan.get('status', 'To Do')) # AI 제안 > AI 상태 > 기본값 순
+        if status_value:
+             notion_properties['상태'] = {"select": {"name": status_value}}
+
+        # 예시: AI 제안으로 '마감일' 속성 설정 (Notion DB에 '마감일' Date 속성 가정)
+        due_date = ai_props.get('마감일')
+        if due_date: # 날짜 형식이 유효한지 검증하는 로직 추가 권장
+            try:
+                # 간단히 YYYY-MM-DD 형식이라고 가정
+                datetime.strptime(due_date, '%Y-%m-%d') # 날짜 형식 검증 (import datetime 필요)
+                notion_properties['마감일'] = {"date": {"start": due_date}}
+            except ValueError:
+                print(f"WARNING: Invalid date format for 마감일: {due_date}")
+
+        # 예시: AI 제안으로 '카테고리' 속성 설정 (Notion DB에 '카테고리' Select 속성 가정)
+        category = ai_props.get('카테고리')
+        if category:
+             notion_properties['카테고리'] = {"select": {"name": category}}
+
+        notion_response = notion_service.add_task(
+            title=ai_plan.get('title', '제목 없음'),
+            details=ai_plan.get('details', ''),
+            properties=notion_properties # 채워진 속성 전달
+        )
+        notion_page_id = notion_response.get('id') if notion_response else None
+...
+
