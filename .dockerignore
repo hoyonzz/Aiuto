@@ -1,0 +1,9 @@
+# .dockerignore
+.git
+.gitignore
+.env
+venv/
+__pycache__/
+*.pyc
+staticfiles/
+*.sqlite3
