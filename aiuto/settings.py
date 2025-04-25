@@ -16,6 +16,19 @@ import environ
 
 
 
+# 타임존 데이터 로딩 시도
+try:
+    import zoneinfo
+    os.environ['TZ'] = 'Asia/Seoul'
+    print("DEBUG: Timezone data potentially configured via zoneinfo.")
+except ImportError:
+    try:
+        import pytz
+        os.environ['TZ'] = 'Asia/Seoul'
+        print("DEBUG: Timezone data potentially configured via pytz.")
+    except ImportError:
+        print("WARNING: Neither zoneinfo nor pytz found. Timezone setting might fail.")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
