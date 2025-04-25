@@ -3,6 +3,7 @@ from django.conf import settings
 import json
 import traceback
 import re
+from datetime import datetime, timedelta
 
 
 
@@ -25,15 +26,38 @@ class AIService:
         category_options = "아이디어/메모, 가족/집안일, 학습/스터디, 건강/운동, 금융/재테크, 자기계발, 개인, 약속, 업무"
         priority_options = "긴급, 중요, 나중"
 
+        # 오늘 날짜 정보 추가
+        today = datetime.now().date()
+        today_str = today.strftime('%Y-%m-%d')
+
         prompt = f"""
         당신은 유능한 AI 비서입니다. 다음 사용자 요청을 분석하여, Notion 데이터베이스에 기록할 구조화된 작업 계획을 JSON 형식으로 생성해주세요.
+        오늘은 {today_str} 입니다. 모든 날짜 계산은 이 날짜를 기준으로 해주세요.
+
         JSON 객체는 다음 키들을 포함해야 합니다:
         - "title": 생성될 작업의 제목 (Notion의 '테스크' 속성에 해당)
-        - "details": 작업을 완료하기 위한 구체적인 단계별 계획 또는 필요한 정보 요약 (Notion 페이지 본문에 해당, Markdown 리스트 형식 선호)
+
+        - "details": 작업을 완료하기 위한 구체적인 단계별 계획 또는 필요한 정보 요약 (Notion 페이지 본문에 해당, Markdown 리스트 형식 선호).
+        작업 실행에 필요한 사전 확인 사항이나 외부 요인(예: 날씨 확인, 예약 필요 여부, 준비물 등)이 있다면 해당 내용도 단계에 포함시켜 주세요.
+        (예를 들어, '세차하기'요청 시 '날씨 확인하기', '주변 세차장 정보', '준비물', '세차 팁 추천내용' 포함)
+        
         - "status": 작업의 초기 상태. 기본값은 "예정". (Notion의 '상태' Select 속성에 해당, 옵션: "예정", "후속조치", "연기", "완료")
-        - "due_date": 작업의 예상 마감일 또는 관련 날짜 (YYYY-MM-DD 형식). 날짜를 특정할 수 없으면 null 또는 빈 문자열. (Notion의 '날짜' Date 속성에 해당)
-        - "categories": 작업의 분류. 다음 옵션 중에서 가장 관련성이 높은 것들을 쉼표로 구분하여 제안해주세요: [{category_options}]. (Notion의 '카테고리' Multi-select 속성에 해당)
-        - "priority": 작업의 중요도. 다음 옵션 중에서 가장 적절한 것 하나를 제안해주세요: [{priority_options}]. 관련 정보가 부족하면 null 또는 빈 문자열. (Notion의 '우선순위' Select 속성에 해당)
+        
+        - "due_date": 작업의 예상 마감일 또는 관련 날짜/시간. 
+        사용자 요청에 날짜와 시간이 모두 명확하게 포함되어 있다면 반드시 ISO 8601 형식(YYYY-MM-DDTHH:mm:ss+09:00 - 한국 시간 기준)으로 반환해주세요.
+        (예:'{today_str} 기준 내일 아침 9시 -> '{ (today + timedelta(days=1)).strftime('%Y-%m-%d') }T09:00:00+09:00')
+        날짜만 명확하거나, 사용자가 "다음 주", "내일" 등 상대적 날짜를 언급하면, 오늘 ({today_str})을 기준으로 계산하여 'YYYY-MM-DD' 형식으로 변환하여 반환해주세요.
+        (예: '다음 주 월요일' -> 계산된 YYYY-MM-DD값)
+        날짜/시간을 특정할 수 없으면 null 또는 빈 문자열을 반환해주세요.
+        
+        - "categories": 작업의 분류. 다음 옵션 중에서 가장 알맞은 것만 쉼표로 구분하여 제안해주세요: [{category_options}]. (Notion의 '카테고리' Multi-select 속성에 해당)
+        
+        - "priority": 작업의 중요도. 다음 옵션 중에서 가장 적절한 것 하나를 제안해주세요: [{priority_options}].
+        긴급 : 즉시 또는 오늘 내 처리 필요.
+        중요 : 명확한 마감일이 있거나, 목표 달성에 필수적인 작업.
+        나중 : 비교적 여유가 있거나, 일상적인 허드렛일
+        요청내용만으로 중요도 판단이 어려우면 null 또는 문자열을 반환해주세요.(예를들어 '쓰레기 분리수거하기'는 '나중' 또는 null)
+
 
 
         결과는 다른 설명이나 주석 없이 순수한 JSON 형식으로만 반환해주세요.
@@ -45,13 +69,14 @@ class AIService:
         "title": "...",
         "details": "...",
         "status": "예정",
-        "due_date": "2024-05-11",
+        "due_date": "YYYY-MM-DD", # 오늘({today_str}) 기준으로 계산된 날짜
         "categories": "업무, 자기계발",
         "priority": "중요"
         }}}}
         """
 
         try:
+            print(f"DEBUG: Calling Google AI API with today's date: {today_str}")
             print("DEBUG: Calling Google AI API...")
             response = self.model.generate_content(prompt)
             print(f"DEBUG: AI Raw Response Text:\n{response.text}")

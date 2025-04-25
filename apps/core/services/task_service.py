@@ -35,11 +35,13 @@ def process_and_create_task(user_input: str) -> tuple[Task | None, str | None]:
         CATEGORY_PROPERTY_NAME = "카테고리"
         PRIORITY_PROPERTY_NAME = "중요도"
         INPUT_DONE_PROPERTY_NAME = "입력완료"
+        DETAILS_SUMMARY_PROPERTY_NAME = "세부 계획 요약"
 
         ai_status = ai_plan.get('status', '예정') # 기본값 '예정'
         ai_due_date = ai_plan.get('due_date') # YYYY-MM-DD 형식 기대
         ai_categories_str = ai_plan.get('categories') # 쉼표 구분 문자열 기대
         ai_priority = ai_plan.get('priority') # '긴급', '중요', '나중' 기대
+        ai_details = ai_plan.get('details', '')
 
         valid_statuses = ["예정", "후속조치", "연기", "완료"]
         if ai_status in valid_statuses:
@@ -47,8 +49,17 @@ def process_and_create_task(user_input: str) -> tuple[Task | None, str | None]:
         else:
             notion_properties[STATUS_PROPERTY_NAME] = {"status" : {"name":"예정"}} # 유효하지 않으면 기본값
 
-        if ai_due_date and isinstance(ai_due_date, str) and len(ai_due_date) == 10:
-            notion_properties[DATE_PROPERTY_NAME] = {"date": {"start": ai_due_date}}
+        if ai_due_date and isinstance(ai_due_date, str):
+            if 'T' in ai_due_date and '+' in ai_due_date: # 시간 포함 형식으로 보이면
+                notion_properties[DATE_PROPERTY_NAME] = {"date": {"start": ai_due_date}}
+                print(f"DEBUG: Setting Notion '{DATE_PROPERTY_NAME}' with time: {ai_due_date}")
+            # 기존 날짜 형식 (YYYY-MM-DD) 처리
+            elif len(ai_due_date) == 10 and ai_due_date[4] == '-' and ai_due_date[7] == '-':
+                notion_properties[DATE_PROPERTY_NAME] = {"date": {"start": ai_due_date}}
+                print(f"DEBUG: Setting Notion '{DATE_PROPERTY_NAME}' date only: {ai_due_date}")
+            else:
+                print(f"WARNING: Invalid or unrecognized date format for '{DATE_PROPERTY_NAME}': {ai_due_date}")
+                ai_due_date = None
         
         if ai_categories_str and isinstance(ai_categories_str, str):
             valid_category_options = ["아이디어/메모", "가족/집안일", "학습/스터디", "건강/운동", "금융/재태크", "자기계발", "개인", "약속", "업무"]
@@ -64,10 +75,19 @@ def process_and_create_task(user_input: str) -> tuple[Task | None, str | None]:
         if INPUT_DONE_PROPERTY_NAME:
             notion_properties[INPUT_DONE_PROPERTY_NAME] = {"checkbox": True}
 
+        if ai_details and DETAILS_SUMMARY_PROPERTY_NAME:
+            # 우선 전체 내용을 넣고, 문제가 생기면 길이를 줄여야됨
+            notion_properties[DETAILS_SUMMARY_PROPERTY_NAME] = {"rich_text": [{
+                "type": "text",
+                "text": {
+                    "content": ai_details
+                }
+            }]}
+            print(f"DEBUG: Setting Notion '{DETAILS_SUMMARY_PROPERTY_NAME}' with details summary.")
 
         notion_response = notion_service.add_task(
             title=ai_plan.get('title', '제목 없음'),
-            details=ai_plan.get('details', ''),
+            details=ai_details,
             properties=notion_properties
         )
         notion_page_id = notion_response.get('id') if notion_response else None
