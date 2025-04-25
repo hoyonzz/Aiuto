@@ -2,13 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import TaskInputSerializer, TaskSerializer
-from apps.core.models import Task
 from apps.core.services.task_service import process_and_create_task
-from apps.core.services.notion_service import notion_service
-from apps.core.services.ai_service import ai_service
 # from rest_framework.permissions import BasePermission
-from django.conf import settings
-import datetime
 
 
 
