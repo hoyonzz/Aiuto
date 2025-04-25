@@ -28,6 +28,9 @@ env = environ.Env(
     NOTION_API_KEY=(str, ''), # str타입, 없으면 빈 문자열
     NOTION_DATABASE_ID=(str, ''),
     GOOGLE_API_KEY=(str, ''),
+    MY_SCRET_API_KEY=(str, ''),
+    ALLOWED_HOSTS=(list, []),
+    CSRF_TURSTED_ORIGINS=(list, []),
 )
 
 # .env 파일 읽기 시도, BASE_DIR은 이미 정의되어 있음
@@ -41,9 +44,9 @@ print("DEBUG: Attempting to read .env via django-environ") # 테스트용 출력
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'FALSE') == 'True'
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['.onrender.com', 'localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -146,3 +149,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 NOTION_API_KEY = env('NOTION_API_KEY')
 NOTION_DATABASE_ID = env('NOTION_DATABASE_ID')
 GOOGLE_API_KEY = env('GOOGLE_API_KEY')
+
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['https://*.onrender.com'])
