@@ -1,6 +1,7 @@
 annotated-types==0.7.0
 anyio==4.9.0
 asgiref==3.8.1
+Brotli==1.1.0
 cachetools==5.5.2
 certifi==2025.1.31
 charset-normalizer==3.4.1
@@ -17,12 +18,14 @@ google-generativeai==0.8.5
 googleapis-common-protos==1.70.0
 grpcio==1.72.0rc1
 grpcio-status==1.71.0
+gunicorn==23.0.0
 h11==0.14.0
 httpcore==1.0.8
 httplib2==0.22.0
 httpx==0.28.1
 idna==3.10
 notion-client==2.3.0
+packaging==25.0
 proto-plus==1.26.1
 protobuf==5.29.4
 psycopg2-binary==2.9.10
@@ -41,3 +44,4 @@ typing_extensions==4.13.2
 tzdata==2025.2
 uritemplate==4.1.1
 urllib3==2.4.0
+whitenoise==6.9.0
