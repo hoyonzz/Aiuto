@@ -16,19 +16,6 @@ import environ
 
 
 
-# # 타임존 데이터 로딩 시도
-# try:
-#     import zoneinfo
-#     os.environ['TZ'] = 'Asia/Seoul'
-#     print("DEBUG: Timezone data potentially configured via zoneinfo.")
-# except ImportError:
-#     try:
-#         import pytz
-#         os.environ['TZ'] = 'Asia/Seoul'
-#         print("DEBUG: Timezone data potentially configured via pytz.")
-#     except ImportError:
-#         print("WARNING: Neither zoneinfo nor pytz found. Timezone setting might fail.")
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,20 +28,20 @@ env = environ.Env(
     NOTION_API_KEY=(str, ''), # str타입, 없으면 빈 문자열
     NOTION_DATABASE_ID=(str, ''),
     GOOGLE_API_KEY=(str, ''),
-    MY_SCRET_API_KEY=(str, ''),
+    MY_SECRET_API_KEY=(str, ''),
     ALLOWED_HOSTS=(list, []),
-    CSRF_TURSTED_ORIGINS=(list, []),
+    CSRF_TRUSTED_ORIGINS=(list, []),
 )
 
 # .env 파일 읽기 시도, BASE_DIR은 이미 정의되어 있음
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-print("DEBUG: Attempting to read .env via django-environ") # 테스트용 출력
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
@@ -152,7 +139,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManfestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
