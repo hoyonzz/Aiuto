@@ -3,7 +3,7 @@ from django.conf import settings
 import json
 import traceback
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 
@@ -49,7 +49,7 @@ class AIService:
             '{(now_kst.date() + timedelta(days=1)).strftime('%Y-%m-%d') }T09:00:00+09:00
             - 날짜만 명확하거나, 사용자가 "다음 주", "내일" 등 상대적 날짜를 언급하면, 오늘 ({today_str})을 기준으로 계산하여 'YYYY-MM-DD' 형식으로만 반환해주세요.
             (예: '다음 주 월요일' -> 계산된 YYYY-MM-DD 값)
-            = 날짜/시간을 특정할 수 없으면 반드시 null을 반환해주세요. (빈 문자열 아님)
+            - 날짜/시간을 특정할 수 없으면 반드시 null을 반환해주세요. (빈 문자열 아님)
                     
         - "categories": 작업의 분류. 다음 옵션 중에서 가장 알맞은 것만 쉼표로 구분하여 제안해주세요: [{category_options}]. (Notion의 '카테고리' Multi-select 속성에 해당)
         
@@ -70,7 +70,7 @@ class AIService:
         "title": "...",
         "details": "...",
         "status": "예정",
-        "due_date": "YYYY-MM-DD", # 오늘({today_str}) 기준으로 계산된 날짜
+        "due_date": "{ (now_kst.date() + timedelta(days=1)).strftime('%Y-%m-%d') }T14:30:00+09:00", # 내일 오후 2시 30분 예시
         "categories": "업무, 자기계발",
         "priority": "중요"
         }}}}
@@ -78,7 +78,6 @@ class AIService:
 
         try:
             print(f"DEBUG: Calling Google AI API with today's date: {today_str}")
-            print("DEBUG: Calling Google AI API...")
 
             response = self.model.generate_content(prompt)
             # print(f"DEBUG: AI Raw Response Text:\n{response.text}")
@@ -107,7 +106,7 @@ class AIService:
             # print(f"AI 원본 응답 (오류 발생 시): {response.text}")
             print(f"파싱 시도한 텍스트: {cleaned_response}") # 파싱 실패 시 어떤 텍스트로 시도했는지 확인
             return {
-                "title": f"{user_input}" (AI 파싱 오류)",
+                "title": f"{user_input} (AI 파싱 오류)",
                 "details": f"AI 응답을 파싱하는 중 오류 발생: {e}. 원본 응답: {response.text[:500]}...",
                 "status": "예정",
                 "due_date": None,
@@ -119,7 +118,7 @@ class AIService:
             print(f"ERROR: Google AI 서비스 처리 중 예외 발생: {e}")
             traceback.print_exc()
             return {
-                "title": f"{user_input}" (AI 파싱 오류)",
+                "title": f"{user_input} (AI 처리 오류)",
                 "details": f"AI 응답을 파싱하는 중 오류 발생: {e}. 원본 응답: {response.text[:500]}...",
                 "status": "예정",
                 "due_date": None,
