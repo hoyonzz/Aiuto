@@ -78,7 +78,7 @@
 
 ### 1. 프로젝트 복제
 ```bash
-git clone https://github.com/your-github-username/Aiuto.git
+git clone https://github.com/hoyonzz/Aiuto.git
 cd Aiuto
 ```
 ### 2. 가상환경 생성 및 활성화
@@ -127,7 +127,7 @@ Aiuto/
 
 ## 💡 개발 과정 및 주요 해결 과제
 
-이 프로젝트를 진행하면서 발생했던 주요 이슈들과 해결 과정은 **[GitHub Issues 탭](https://github.com/hoyonzz/Aiuto/issues)** (**실제 이슈 탭 링크로 변경**) 에 기록되어 있습니다.
+이 프로젝트를 진행하면서 발생했던 주요 이슈들과 해결 과정은 **[GitHub Issues 탭](https://github.com/hoyonzz/Aiuto/issues)** 에 기록되어 있습니다.
 *   환경 변수 관리 방법 결정 (`django-environ` 도입)
 *   Notion API 연동 오류 해결 (인증, 속성 매핑, 데이터 형식 등)
 *   AI 프롬프트 엔지니어링을 통한 결과 개선 (날짜/시간 처리, 중요도 판단 등)
