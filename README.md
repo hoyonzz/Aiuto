@@ -1,11 +1,3 @@
-**2025.04.26 핵심변경사항**
-* **배포 완료:** Render 배포 성공 https://aiuto-web.onrender.com/
-* **기술 스택 업데이트:** PostgreSQL, Gunicorn, Whitenoise 
-* **핵심 기능 상세화:** AI가 제안하는 속성들, Notion '세부 계획 요약' 연동
-* **DB 역할 명확화:** PostgreSQL 사용
-
-
-
 # Aiuto (아이우토): 당신의 AI 조력자 🤖 Notion 자동화 비서
 
 이 저장소는 v1입니다. 현재 배포는 중단했고, Aiuto-v2에서 FastAPI·Celery 기반으로 다시 만들고 있습니다.
@@ -58,12 +50,12 @@
 *   **Deployment:** Render
 *   **IDE & Tools:** VS Code, Git, GitHub, Postman, pgAdmin
 
-## 🏗️ 시스템 아키텍처 (예시)
+## 🏗️ 시스템 아키텍처
 
 ```
 +---------------+       +----------------------+       +-------------------+       +-----------------+
 | Web Browser   | ----> | Django Backend       | ----> | AI Services       | ----> | External APIs   |
-| (HTML Form)   | HTTP  | (Django Views, DRF)  |       | (Gemini, Perplexity)|       | (Google, Notion)|
+| (HTML Form)   | HTTP  | (Django Views, DRF)  |       | (Gemini)|       | (Google, Notion)|
 +---------------+       +----------------------+       +-------------------+       +-----------------+
                           |        | ^                    |
                           |        | |                    |
@@ -127,7 +119,6 @@ Aiuto/
 
 ## 💡 개발 과정 및 주요 해결 과제
 
-이 프로젝트를 진행하면서 발생했던 주요 이슈들과 해결 과정은 **[GitHub Issues 탭](https://github.com/hoyonzz/Aiuto/issues)** 에 기록되어 있습니다.
 *   환경 변수 관리 방법 결정 (`django-environ` 도입)
 *   Notion API 연동 오류 해결 (인증, 속성 매핑, 데이터 형식 등)
 *   AI 프롬프트 엔지니어링을 통한 결과 개선 (날짜/시간 처리, 중요도 판단 등)
@@ -154,5 +145,5 @@ Aiuto/
 
 🧑‍💻 만든이
 [신호용]
-GitHub: [https://github.com/hoyonzz/Aiuto/tree/main]
-Email: [hoyong0511@naver.com]
+GitHub: [https://github.com/hoyonzz]
+Email: [hoyong0511@gmail.com]
