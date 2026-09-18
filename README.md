@@ -8,6 +8,8 @@
 
 # Aiuto (아이우토): 당신의 AI 조력자 🤖 Notion 자동화 비서
 
+이 저장소는 v1입니다. 현재 배포는 중단했고, Aiuto-v2에서 FastAPI·Celery 기반으로 다시 만들고 있습니다.
+
 [![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)](https://www.python.org)
 [![Django](https://img.shields.io/badge/Django-5.2-green?logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![Django REST Framework](https://img.shields.io/badge/DRF-3.15-red?logo=django)](https://www.django-rest-framework.org/)
@@ -17,8 +19,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Aiuto**는 바쁜 일상 속에서 놓치기 쉬운 할 일들을 **웹 인터페이스**를 통해 간편하게 기록하면, **Google AI (Gemini)** 의 도움을 받아 체계적인 실행 계획과 관련 정보(마감일, 중요도, 카테고리 등)를 자동으로 생성하여 **Notion 데이터베이스에 깔끔하게 정리**해주는 개인 맞춤형 AI 비서 프로젝트입니다.
-
-**🚀 배포된 웹사이트:** [https://aiuto-web.onrender.com](https://aiuto-web.onrender.com)
 
 **(✨ 프로젝트 핵심 기능 시연 GIF ✨)**
 ![Image](https://github.com/user-attachments/assets/2ec04b5c-fe31-469d-9610-74fff5dea0d0)
@@ -41,7 +41,7 @@
     *   **중요도 (Priority):** '긴급', '중요', '나중' 우선순위 제안.
 *   **📝 Notion 자동 기록:** AI가 생성한 모든 정보(제목, 세부 계획, 상태, 날짜, 카테고리, 중요도 등)를 지정된 Notion 데이터베이스에 **정확한 속성으로 매핑하여 새로운 페이지를 자동으로 생성**합니다. **'세부 계획 요약'** 속성을 통해 데이터베이스 뷰에서도 내용을 바로 확인할 수 있습니다.
 *   **💾 데이터베이스 저장:** 생성된 작업 정보와 Notion 페이지 ID를 **PostgreSQL 데이터베이스**에 저장하여 관리합니다.
-*   **☁️ 클라우드 배포:** **Render** 플랫폼에 성공적으로 배포되어 웹 URL을 통해 실제 서비스로 이용 가능합니다.
+*   **☁️ 클라우드 배포" → "Render에 배포해 운영했습니다. 현재는 v2 재설계로 배포를 중단한 상태입니다
 *   **🔌 API 엔드포인트 제공:** Django REST Framework 기반의 Task 생성 API (`/api/tasks/create/`)를 제공하며, 향후 모바일 앱 등 다른 클라이언트와의 연동 기반을 마련했습니다.
 
 ## 🛠️ 기술 스택
@@ -100,7 +100,7 @@ pip install -r requirements.txt
 ### 7. 개발 서버 실행
 
 ⚙️ 사용 방법
-1.  **배포된 웹사이트 접속:** [https://aiuto-web.onrender.com](https://aiuto-web.onrender.com)로 접속합니다.
+1.  **로컬 개발 서버를 실행한 뒤 접속합니다.
 2.  **텍스트 입력:** 입력 폼에 할 일, 아이디어 등을 자연스러운 문장으로 입력합니다.
 3.  **전달:** 'AI 비서에게 전달' 버튼을 클릭합니다.
 4.  **결과 확인:** 잠시 후 페이지에 성공 메시지가 표시되고, 연결된 **Notion 데이터베이스**에 새로운 작업 페이지가 AI가 제안한 속성들과 함께 생성됩니다.
